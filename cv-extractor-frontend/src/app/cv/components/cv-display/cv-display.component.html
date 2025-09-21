@@ -1,0 +1,607 @@
+<!-- src/app/cv/components/cv-viewer-page/cv-viewer-page.component.html -->
+<div class="viewer-container">
+  <!-- Header avec informations du CV -->
+  <div class="viewer-header mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h4 class="mb-1">
+              <i class="bi bi-file-earmark-person me-2 text-primary"></i>
+              {{ currentCV?.informations_personnelles?.nom || 'CV Importé' }}
+            </h4>
+            <p class="text-muted mb-0">
+              <i class="bi bi-calendar me-1"></i>
+              Analysé le {{ currentCV?.metadonnees?.date_extraction | date:'dd/MM/yyyy à HH:mm' }}
+            </p>
+          </div>
+          <div class="col-md-4 text-end">
+            <span class="badge badge-status" [ngClass]="getStatusClass(currentCV?.status || '')">
+              <i class="{{ getStatusIcon(currentCV?.status || '') }} me-1"></i>
+              {{ currentCV?.status || 'Inconnu' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interface principale divisée -->
+  <div class="split-interface" *ngIf="currentCV">
+    <!-- Partie gauche : Formulaire éditable -->
+    <div class="left-panel">
+      <div class="card h-100">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              <i class="bi bi-pencil-square me-2"></i>
+              Données Extraites
+            </h5>
+    
+            <div class="edit-controls">
+              <button
+                type="button"
+                class="btn btn-sm"
+                [class.btn-outline-primary]="!isEditMode"
+                [class.btn-primary]="isEditMode"
+                [disabled]="isSaving"
+                (click)="toggleEditMode()">
+                <i class="bi bi-gear me-1"></i>
+                {{ isEditMode ? 'Mode Lecture' : 'Mode Édition' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body overflow-auto">
+          <form [formGroup]="cvForm" (ngSubmit)="onSaveChanges()">
+
+            <!-- Informations Personnelles -->
+            <div class="form-section">
+              <h6 class="section-title">
+                <i class="bi bi-person-fill me-2 text-primary"></i>
+                Informations Personnelles
+              </h6>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="form-group-with-edit">
+                    <label class="form-label">Nom complet</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control"
+                        formControlName="nom"
+                        [readonly]="!isEditMode">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        [disabled]="!isEditMode"
+                        title="Éditer">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group-with-edit">
+                    <label class="form-label">Email</label>
+                    <div class="input-group">
+                      <input
+                        type="email"
+                        class="form-control"
+                        formControlName="email"
+                        [readonly]="!isEditMode">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        [disabled]="!isEditMode"
+                        title="Éditer">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group-with-edit">
+                    <label class="form-label">Téléphone</label>
+                    <div class="input-group">
+                      <input
+                        type="tel"
+                        class="form-control"
+                        formControlName="telephone"
+                        [readonly]="!isEditMode">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        [disabled]="!isEditMode"
+                        title="Éditer">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-group-with-edit">
+                    <label class="form-label">Adresse</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control"
+                        formControlName="adresse"
+                        [readonly]="!isEditMode">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        [disabled]="!isEditMode"
+                        title="Éditer">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compétences Techniques -->
+            <div class="form-section">
+              <h6 class="section-title">
+                <i class="bi bi-gear-fill me-2 text-warning"></i>
+                Compétences Techniques
+              </h6>
+
+              <div class="skills-editor">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <span
+                    *ngFor="let skill of currentCV.competences_techniques; let i = index"
+                    class="skill-tag">
+                    {{ skill }}
+                    <button
+                      type="button"
+                      class="btn-remove-skill"
+                      [disabled]="!isEditMode"
+                      (click)="removeSkill(i)"
+                      title="Supprimer">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </span>
+                </div>
+
+                <div class="add-skill" *ngIf="isEditMode">
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Ajouter une compétence"
+                      #newSkillInput>
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      (click)="addSkill(newSkillInput.value); newSkillInput.value = ''">
+                      <i class="bi bi-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expériences Professionnelles -->
+            <div class="form-section">
+              <h6 class="section-title">
+                <i class="bi bi-briefcase-fill me-2 text-success"></i>
+                Expériences Professionnelles
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success ms-2"
+                  [disabled]="!isEditMode"
+                  (click)="addExperience()">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </h6>
+
+              <div formArrayName="experiences">
+                <div
+                  *ngFor="let expGroup of getExperiencesFormArray().controls; let i = index"
+                  class="experience-item"
+                  [formGroupName]="i">
+
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted">Expérience {{ i + 1 }}</small>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger"
+                      [disabled]="!isEditMode"
+                      (click)="removeExperience(i)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <label class="form-label">Poste</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="poste"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Entreprise</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="entreprise"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Période</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="periode"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Description</label>
+                      <textarea
+                        class="form-control form-control-sm"
+                        rows="2"
+                        formControlName="description"
+                        [readonly]="!isEditMode"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Formations -->
+            <div class="form-section">
+              <h6 class="section-title">
+                <i class="bi bi-mortarboard-fill me-2 text-info"></i>
+                Formations
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-info ms-2"
+                  [disabled]="!isEditMode"
+                  (click)="addFormation()">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </h6>
+
+              <div formArrayName="formations">
+                <div
+                  *ngFor="let formGroup of getFormationsFormArray().controls; let i = index"
+                  class="formation-item"
+                  [formGroupName]="i">
+
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted">Formation {{ i + 1 }}</small>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger"
+                      [disabled]="!isEditMode"
+                      (click)="removeFormation(i)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <label class="form-label">Diplôme</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="diplome"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Établissement</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="etablissement"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Année</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="annee"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Mention</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="mention"
+                        [readonly]="!isEditMode">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Langues -->
+            <div class="form-section">
+              <h6 class="section-title">
+                <i class="bi bi-translate me-2 text-warning"></i>
+                Langues
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-warning ms-2"
+                  [disabled]="!isEditMode"
+                  (click)="addLangue()">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </h6>
+
+              <div formArrayName="langues">
+                <div
+                  *ngFor="let langGroup of getLanguesFormArray().controls; let i = index"
+                  class="langue-item"
+                  [formGroupName]="i">
+
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted">Langue {{ i + 1 }}</small>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger"
+                      [disabled]="!isEditMode"
+                      (click)="removeLangue(i)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <label class="form-label">Langue</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="langue"
+                        [readonly]="!isEditMode">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Niveau</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        formControlName="niveau"
+                        [readonly]="!isEditMode">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="form-actions" *ngIf="isEditMode">
+              <!-- Message d'erreur -->
+              <div *ngIf="saveError" class="alert alert-danger alert-sm mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ saveError }}
+                <button type="button"
+                        class="btn-close btn-close-sm"
+                        (click)="saveError = null"
+                        aria-label="Fermer"></button>
+              </div>
+
+              <!-- Indicateur de modifications non sauvegardées -->
+              <div *ngIf="hasUnsavedChanges() && !isSaving"
+                   class="alert alert-warning alert-sm mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <small>Vous avez des modifications non sauvegardées</small>
+              </div>
+
+              <div class="d-flex gap-2 align-items-center">
+                <!-- Bouton Sauvegarder -->
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  [disabled]="isSaving || !cvForm.valid"
+                  (click)="onSaveChanges()">
+
+                  <!-- État normal -->
+                  <span *ngIf="!isSaving">
+                    <i class="bi bi-check me-1"></i>
+                    Sauvegarder
+                  </span>
+
+                  <!-- État de chargement -->
+                  <span *ngIf="isSaving">
+                    <span class="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"></span>
+                    Sauvegarde...
+                  </span>
+                </button>
+
+                <!-- Bouton Annuler -->
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  [disabled]="isSaving"
+                  (click)="cancelChanges()">
+                  <i class="bi bi-x me-1"></i>
+                  Annuler
+                </button>
+
+                <!-- Indicateur de validation du formulaire -->
+                <small *ngIf="!cvForm.valid && !isSaving" class="text-danger">
+                  <i class="bi bi-exclamation-circle me-1"></i>
+                  Veuillez corriger les erreurs du formulaire
+                </small>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+<!-- Partie droite : Aperçu du CV original -->
+<div class="right-panel">
+  <div class="card h-100">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="bi bi-file-earmark-pdf me-2"></i>
+        Document Original
+      </h5>
+
+      <div class="export-section">
+        <div class="btn-group export-dropdown" [class.show]="isExportDropdownOpen">
+          <button type="button" class="btn btn-sm"
+                  [class.btn-outline-primary]="!isExportDropdownOpen"
+                  [class.btn-primary]="isExportDropdownOpen"
+                  (click)="toggleExportDropdown()">
+            <i class="bi bi-download me-1"></i>
+            Exporter
+          </button>
+
+          <div class="dropdown-menu dropdown-menu-end" [class.show]="isExportDropdownOpen">
+            <h6 class="dropdown-header">Format d'export</h6>
+            <button class="dropdown-item" (click)="exportCV('json')">
+              <i class="bi bi-filetype-json text-warning me-2"></i> Format JSON
+            </button>
+            <button class="dropdown-item" (click)="exportCV('text')">
+              <i class="bi bi-file-earmark-text text-info me-2"></i> Format Texte
+            </button>
+            <button class="dropdown-item" (click)="exportCV('onetech')">
+              <i class="bi bi-file-earmark-word text-primary me-2"></i> Format OneTech
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <div class="card-body p-0">
+          <div class="document-viewer">
+            
+            <!-- Chargement -->
+            <div *ngIf="isDocumentLoading" class="loading-state">
+              <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                <div class="spinner-border text-primary mb-3" role="status">
+                  <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="text-muted">
+                  <span *ngIf="documentType === 'word' && conversionSupported">
+                    Conversion du document Word en cours...
+                  </span>
+                  <span *ngIf="documentType !== 'word' || !conversionSupported">
+                    Chargement du document...
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Aperçu PDF (original ou converti) -->
+            <div *ngIf="!isDocumentLoading && documentUrl && canDisplayDocument()" 
+                 class="pdf-container">
+
+              <iframe
+                [src]="documentUrl"
+                class="document-frame pdf-frame"
+                frameborder="0"
+                title="Aperçu du CV">
+              </iframe>
+            </div>
+
+            <!-- Message pour les fichiers Word non convertis -->
+            <div *ngIf="!isDocumentLoading && documentType === 'word' && !canDisplayDocument()" 
+                 class="no-preview">
+              <div class="alert alert-warning m-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Document Word détecté</strong>
+                
+                <div class="mt-2" *ngIf="!conversionSupported">
+                  <p class="mb-2">La conversion automatique en PDF n'est pas disponible sur ce serveur.</p>
+                  <p class="mb-3">Les documents Word ne peuvent pas être prévisualisés directement dans le navigateur.</p>
+                  
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-primary" (click)="downloadOriginalCV()">
+                      <i class="bi bi-download me-1"></i>
+                      Télécharger le document
+                    </button>
+                    <button class="btn btn-outline-secondary" (click)="refreshDocumentPreview()">
+                      <i class="bi bi-arrow-clockwise me-1"></i>
+                      Réessayer
+                    </button>
+                  </div>
+                </div>
+
+                <div class="mt-2" *ngIf="conversionSupported && documentLoadError">
+                  <p class="mb-2">Erreur lors de la conversion automatique.</p>
+                  <p class="mb-3">{{ documentLoadError }}</p>
+                  
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-warning" (click)="refreshDocumentPreview()">
+                      <i class="bi bi-arrow-clockwise me-1"></i>
+                      Réessayer la conversion
+                    </button>
+                    <button class="btn btn-primary" (click)="downloadOriginalCV()">
+                      <i class="bi bi-download me-1"></i>
+                      Télécharger l'original
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Erreur générale -->
+            <div *ngIf="!isDocumentLoading && documentLoadError && documentType !== 'word'" 
+                 class="error-state">
+              <div class="alert alert-danger m-3">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <strong>Erreur de chargement</strong>
+                <p class="mt-2 mb-3">{{ getDocumentErrorMessage() }}</p>
+                
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline-danger" (click)="refreshDocumentPreview()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Réessayer
+                  </button>
+                  <button class="btn btn-primary" (click)="downloadOriginalCV()" 
+                          *ngIf="currentCV?.filename_original">
+                    <i class="bi bi-download me-1"></i>
+                    Télécharger
+                  </button>
+                </div>
+              </div>
+            </div>
+
+        
+
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- État vide -->
+  <div *ngIf="!currentCV" class="empty-state">
+    <div class="card text-center">
+      <div class="card-body">
+        <i class="bi bi-file-earmark-x display-1 text-muted mb-3"></i>
+        <h5>Aucun CV sélectionné</h5>
+        <p class="text-muted">
+          Importez un CV pour voir les données extraites et l'aperçu.
+        </p>
+        <button
+          type="button"
+          class="btn btn-primary"
+          routerLink="/cv/upload">
+          <i class="bi bi-upload me-1"></i>
+          Importer un CV
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

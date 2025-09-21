@@ -1,0 +1,927 @@
+// Variables
+$primary-color: #0d6efd;
+$success-color: #198754;
+$warning-color: #ffc107;
+$info-color: #0dcaf0;
+$danger-color: #dc3545;
+$border-color: #dee2e6;
+$text-muted: #6c757d;
+$background-light: #f8f9fa;
+
+// Mixins
+@mixin transition($property: all, $duration: 0.3s) {
+  transition: $property $duration ease;
+}
+
+@mixin card-shadow {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+// Container principal
+.viewer-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1rem;
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+  }
+}
+
+// Header du viewer
+.viewer-header {
+  .card {
+    border: none;
+    @include card-shadow;
+    border-radius: 0.75rem;
+  }
+
+  .badge-status {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+
+    &.bg-success {
+      background-color: $success-color !important;
+    }
+
+    &.bg-warning {
+      background-color: $warning-color !important;
+      color: #000 !important;
+    }
+
+    &.bg-danger {
+      background-color: $danger-color !important;
+    }
+
+    &.bg-secondary {
+      background-color: #6c757d !important;
+    }
+  }
+}
+
+// Interface divisée
+.split-interface {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  min-height: calc(100vh - 200px);
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+// Panel gauche (formulaire)
+.left-panel {
+  .card {
+    border: none;
+    @include card-shadow;
+    border-radius: 0.75rem;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, $primary-color, #0056b3);
+    color: white;
+    border-radius: 0.75rem 0.75rem 0 0;
+    padding: 1rem 1.25rem;
+
+    h5 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .edit-controls .btn {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: white;
+      @include transition();
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-color: white;
+      }
+
+      &.btn-primary {
+        background-color: white;
+        color: $primary-color;
+        border-color: white;
+
+        &:hover {
+          background-color: $background-light;
+        }
+      }
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+
+    @media (max-width: 768px) {
+      padding: 1rem;
+    }
+  }
+}
+
+// Sections du formulaire
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .section-title {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Groupes de formulaire avec bouton d'édition
+.form-group-with-edit {
+  margin-bottom: 1rem;
+
+  .form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+  }
+
+  .input-group {
+    .form-control {
+      border-right: none;
+      @include transition();
+
+      &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+      }
+
+      &[readonly] {
+        background-color: $background-light;
+        border-color: #e9ecef;
+      }
+    }
+
+    .btn {
+      border-left: none;
+      border-color: #ced4da;
+      @include transition();
+
+      &:disabled {
+        opacity: 0.5;
+      }
+
+      &:not(:disabled):hover {
+        background-color: $primary-color;
+        border-color: $primary-color;
+        color: white;
+      }
+    }
+  }
+}
+
+// Éditeur de compétences
+.skills-editor {
+  .skill-tag {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, $primary-color, #0056b3);
+    color: white;
+    padding: 0.375rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    margin: 0.25rem;
+    @include transition();
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-remove-skill {
+      background: none;
+      border: none;
+      color: white;
+      padding: 0;
+      margin-left: 0.5rem;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      @include transition();
+
+      &:hover:not(:disabled) {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .add-skill {
+    .input-group {
+      max-width: 300px;
+
+      .form-control {
+        border-radius: 0.375rem 0 0 0.375rem;
+      }
+
+      .btn {
+        border-radius: 0 0.375rem 0.375rem 0;
+      }
+    }
+  }
+}
+
+// Items d'expérience et formation
+.experience-item,
+.formation-item {
+  background: $background-light;
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  @include transition();
+
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 2px 4px rgba($primary-color, 0.1);
+  }
+
+  .form-control {
+    border: 1px solid #ced4da;
+    @include transition();
+
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+    }
+
+    &[readonly] {
+      background-color: white;
+    }
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+}
+
+// Actions du formulaire
+.form-actions {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  gap: 0.5rem;
+
+  .btn {
+    @include transition();
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+// Panel droit (aperçu)
+.right-panel {
+  .card {
+    border: none;
+    @include card-shadow;
+    border-radius: 0.75rem;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, $info-color, #0056b3);
+    color: white;
+
+    .btn-group .btn {
+      background-color: $primary-color;
+      color: #fff;
+      border-color: $primary-color;
+      font-weight: 600;
+      @include transition();
+
+      &:hover,
+      &:focus {
+        background-color: darken($primary-color, 10%);
+        color: #fff;
+        border-color: darken($primary-color, 10%);
+        box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+      }
+    }
+  }
+}
+
+// Visualiseur PDF
+.pdf-viewer {
+  height: calc(100vh - 300px);
+  position: relative;
+  overflow: hidden;
+
+  &.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: white;
+  }
+
+  .pdf-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .document-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 2rem;
+
+    .document-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.7;
+    }
+
+    h6 {
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .loading-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: $text-muted;
+
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+}
+
+// === Document viewer (affichage normal corrigé) ===
+.document-viewer {
+  height: calc(100vh - 200px);
+  width: 100%;
+  position: relative;
+
+  .pdf-container {
+    height: 100%;
+    width: 100%;
+
+    .document-frame {
+      width: 100%;
+      height: 100%;
+      min-height: 800px;
+      border: none;
+    }
+  }
+
+  .no-document {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+  }
+}
+
+// État vide
+.empty-state {
+  .card {
+    border: 2px dashed #dee2e6;
+    background: $background-light;
+    border-radius: 1rem;
+
+    .card-body {
+      padding: 3rem 2rem;
+
+      i {
+        opacity: 0.5;
+      }
+
+      h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: $text-muted;
+        margin-bottom: 1.5rem;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 1200px) {
+  .split-interface {
+    .left-panel .card-body {
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .right-panel .pdf-viewer {
+      height: 500px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .viewer-header {
+    .row {
+      text-align: center;
+
+      .col-md-4 {
+        margin-top: 1rem;
+      }
+    }
+  }
+
+  .form-section .section-title {
+    font-size: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .btn {
+      margin-top: 0.5rem;
+      margin-left: 0 !important;
+    }
+  }
+
+  .skills-editor .add-skill .input-group {
+    max-width: 100%;
+  }
+
+  .experience-item,
+  .formation-item {
+    padding: 0.75rem;
+
+    .row .col-md-6,
+    .row .col-12 {
+      margin-bottom: 0.75rem;
+    }
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.split-interface {
+  animation: fadeIn 0.5s ease-out;
+}
+
+// Styles d'impression
+@media print {
+  .viewer-container {
+    max-width: none;
+    padding: 0;
+  }
+
+  .viewer-header,
+  .right-panel {
+    display: none;
+  }
+
+  .split-interface {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel .card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .form-actions,
+  .edit-controls,
+  .preview-controls {
+    display: none;
+  }
+}
+
+//dernier ajout 
+// Harmonisation des panels gauche et droit
+.left-panel,
+.right-panel {
+  display: flex;
+  flex-direction: column;
+
+  .card {
+    border: none;
+    @include card-shadow;
+    border-radius: 0.75rem;
+    height: 100%; // prend toute la hauteur dispo
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-header {
+    flex-shrink: 0; // garde sa taille
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem 0.75rem 0 0;
+
+    h5 {
+      margin: 0;
+      font-weight: 600;
+    }
+  }
+
+  .card-body {
+    flex: 1; // prend l’espace restant
+    overflow-y: auto; // scroll si contenu long
+    padding: 1.5rem;
+
+    @media (max-width: 768px) {
+      padding: 1rem;
+    }
+  }
+}
+
+// Spécifiques au header
+.left-panel .card-header {
+  background: linear-gradient(135deg, $primary-color, #0056b3);
+  color: white;
+}
+
+.right-panel .card-header {
+  background: linear-gradient(135deg, $info-color, #0056b3);
+  color: white;
+
+  .btn-group .btn {
+    background-color: $primary-color;
+    color: #fff;
+    border-color: $primary-color;
+    font-weight: 600;
+    @include transition();
+
+    &:hover,
+    &:focus {
+      background-color: darken($primary-color, 10%);
+      color: #fff;
+      border-color: darken($primary-color, 10%);
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+    }
+  }
+}
+
+// Styles améliorés pour le bouton d'export
+
+
+.export-dropdown {
+  .dropdown-menu {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    min-width: 220px;
+    
+    .dropdown-header {
+      font-weight: 600;
+      color: #495057;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+    }
+    
+    .dropdown-item {
+      border-radius: 0.5rem;
+      padding: 0.6rem 1rem;
+      margin: 0.2rem 0;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      
+      &:hover {
+        background-color: #f8f9fa;
+        transform: translateX(3px);
+      }
+      
+      &:active {
+        background-color: #e9ecef;
+      }
+      
+      i {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+        margin-bottom: 0.2rem;
+      }
+      
+      small {
+        font-size: 0.75rem;
+        margin-top: 0.1rem;
+      }
+    }
+    
+    .dropdown-divider {
+      margin: 0.4rem 0;
+    }
+  }
+}
+
+// Animation d'ouverture du dropdown
+@keyframes slideInDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-menu.show {
+  animation: slideInDropdown 0.2s ease-out;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .card-header .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch !important;
+  }
+  
+  .export-section {
+    order: -1; // Met l'export en premier sur mobile
+  }
+  
+  .btn-export {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .export-dropdown .dropdown-menu {
+    width: 100%;
+    left: 0 !important;
+    right: 0 !important;
+  }
+}
+
+// Effet de surbrillance au survol des options
+.dropdown-item {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(40, 167, 69, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+
+
+// ===== STYLE DU BOUTON D'EXPORT  =====
+.export-section {
+  .btn-group .btn {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    @include transition();
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: white;
+    }
+
+    &.btn-primary {
+      background-color: white;
+      color: $primary-color;
+      border-color: white;
+
+      &:hover {
+        background-color: $background-light;
+        color: $primary-color;
+      }
+    }
+  
+    
+    // Style quand actif/déroulé (comme btn-primary)
+    &.btn-primary {
+      background-color: $primary-color;
+      color: white;
+      border-color: $primary-color;
+      
+      &:hover {
+        background-color: darken($primary-color, 10%);
+        border-color: darken($primary-color, 10%);
+      }
+    }
+  }
+}
+
+// Menu déroulant de l'export
+.export-dropdown {
+  .dropdown-menu {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    min-width: 200px;
+    
+    .dropdown-header {
+      font-weight: 600;
+      color: #495057;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .dropdown-item {
+      border-radius: 0.25rem;
+      padding: 0.5rem 1rem;
+      margin: 0.25rem 0;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: #f8f9fa;
+      }
+      
+      i {
+        width: 20px;
+        text-align: center;
+      }
+      
+      small {
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+}
+
+// Animation d'ouverture du dropdown
+@keyframes slideInDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu.show {
+  animation: slideInDropdown 0.2s ease-out;
+}
+
+// Effet de surbrillance au survol des options
+.dropdown-item {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba($primary-color, 0.1), transparent);
+    transition: left 0.3s ease;
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .card-header .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+    
+    .export-section {
+      order: -1;
+      
+      .btn-group {
+        width: 100%;
+        
+        .btn {
+          width: 100%;
+          justify-content: center;
+        }
+        
+        .dropdown-menu {
+          width: 100%;
+          left: 0 !important;
+          right: 0 !important;
+        }
+      }
+    }
+  }
+}
+
+.no-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  
+  .alert {
+    max-width: 500px;
+    text-align: center;
+  }
+}
+
+.no-document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.document-viewer {
+  height: calc(100vh - 200px);
+  width: 100%;
+  position: relative;
+
+  .pdf-container {
+    height: 100%;
+    width: 100%;
+
+    .document-frame {
+      width: 100%;
+      height: 100%;
+      min-height: 800px;
+      border: none;
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "/auth": {
+    "target": "http://172.21.55.213:8180",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
