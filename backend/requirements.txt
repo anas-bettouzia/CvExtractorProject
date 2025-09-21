@@ -20,3 +20,21 @@ pandas==2.1.4
 
 # Utilitaires
 python-dateutil==2.8.2
+
+
+# docx2pdf 
+docx2pdf==0.1.8
+
+# mammoth + weasyprint (cross-platform)
+mammoth==1.6.0
+weasyprint==60.2
+
+# Dépendances pour WeasyPrint
+cffi>=1.15.0
+pillow>=9.0.0
+pyphen>=0.13.0
+
+# Pour la manipulation de documents Word
+python-docx>=0.8.11
+
+aiofiles==23.2.1
